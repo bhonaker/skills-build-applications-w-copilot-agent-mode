@@ -34,7 +34,6 @@ export async function seed() {
 
     const monaRunAt = new Date('2026-01-10T12:00:00.000Z');
     const hubotCycleAt = new Date('2026-01-11T12:00:00.000Z');
-    const monaWalkAt = new Date('2026-01-12T12:00:00.000Z');
     await Activity.updateOne(
       { user: mona._id, team: octocats._id, type: 'run', occurredAt: monaRunAt },
       { $set: { user: mona._id, team: octocats._id, type: 'run', minutes: 40, points: 40, occurredAt: monaRunAt } },
@@ -45,11 +44,6 @@ export async function seed() {
       { $set: { user: hubot._id, team: robocats._id, type: 'cycle', minutes: 25, points: 25, occurredAt: hubotCycleAt } },
       { upsert: true },
     );
-    await Activity.updateOne(
-      { user: mona._id, team: octocats._id, type: 'walk', occurredAt: monaWalkAt },
-      { $set: { user: mona._id, team: octocats._id, type: 'walk', minutes: 20, points: 20, occurredAt: monaWalkAt } },
-      { upsert: true },
-    );
     await Workout.updateOne(
       { title: 'Intervals' },
       { $set: { title: 'Intervals', focus: 'endurance', minutes: 30, difficulty: 'moderate' } },
@@ -58,11 +52,6 @@ export async function seed() {
     await Workout.updateOne(
       { title: 'Strength Circuit' },
       { $set: { title: 'Strength Circuit', focus: 'strength', minutes: 30, difficulty: 'moderate' } },
-      { upsert: true },
-    );
-    await Workout.updateOne(
-      { title: 'Recovery Walk' },
-      { $set: { title: 'Recovery Walk', focus: 'endurance', minutes: 20, difficulty: 'easy' } },
       { upsert: true },
     );
   } finally {
