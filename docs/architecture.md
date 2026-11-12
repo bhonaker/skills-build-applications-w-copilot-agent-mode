@@ -28,13 +28,13 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 ## Implementation decisions
 
-- Presentation tier: Keep rendering and interaction in React; use the shared API client with relative `/api` paths, and expose loading, empty, and error states accessibly.
-- Logic tier: Keep HTTP handling and request validation in Express routes/services. Return deliberate 4xx responses for invalid or unknown input rather than leaking database errors as 500s.
-- Data tier: Use Mongoose models for persisted fields, references, and required-field validation. Keep seed data representative and idempotent.
-- Activity tracking: Validate that submitted user and team IDs are well-formed and refer to existing records. Persist the submitted user, team, type, and minutes, and compute points and occurrence time on the server.
-- Team management: Require a name, preserve the submitted name and mascot, and persist the members as user references.
-- Leaderboard: Sum activity points by team, sort by total points descending, and return each team name, total, and 1-based rank.
-- Workout suggestions: Find the user by email and base the first suggestion's focus on their goal or recent activity, with a reason. Return a deliberate 4xx when no user matches.
+- Presentation tier decision: Keep rendering and interaction in React; use the shared API client with relative `/api` paths, and expose loading, empty, and error states accessibly.
+- Logic tier decision: Keep HTTP handling and request validation in Express routes/services. Return deliberate 4xx responses for invalid or unknown input rather than leaking database errors as 500s.
+- Data tier decision: Use Mongoose models for persisted fields, references, and required-field validation. Keep seed data representative and idempotent.
+- Activity tracking approach: Validate that submitted user and team IDs are well-formed and refer to existing records. Persist the submitted user, team, type, and minutes, and compute points and occurrence time on the server.
+- Team management approach: Require a name, preserve the submitted name and mascot, and persist the members as user references.
+- Leaderboard approach: Sum activity points by team, sort by total points descending, and return each team name, total, and 1-based rank.
+- Workout suggestions approach: Find the user by email and base the first suggestion's focus on their goal or recent activity, with a reason. Return a deliberate 4xx when no user matches.
 
 ## Test plan
 
