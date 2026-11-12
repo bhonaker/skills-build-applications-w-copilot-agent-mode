@@ -55,13 +55,29 @@ describe('OctoFit API contract', () => {
     const member = await User.create({ name: 'Mona', email: 'mona@example.com', fitnessGoal: 'endurance' });
     const invalid = await request(app).post('/api/teams').send({ mascot: 'Mona' });
     expect(invalid.status).toBe(400);
-    const created = await request(app).post('/api/teams').send({ name: 'Octocats', mascot: 'Mona', members: [member._id.toString()] });
+    const memberId = member._id.toString();
+    const created = await request(app).post('/api/teams').send({ name: 'Octocats', mascot: 'Mona', members: [memberId, memberId.toUpperCase(), memberId] });
     expect(created.status).toBe(201);
     expect(created.body.team).toMatchObject({ name: 'Octocats', mascot: 'Mona' });
+    expect(created.body.team.members.map((id: string) => id.toString())).toEqual([memberId]);
+    expect((await User.findById(member._id))?.team?.toString()).toBe(created.body.team._id);
     const listed = await request(app).get('/api/teams');
     expect(listed.body.teams).toHaveLength(1);
     expect(listed.body.teams[0]).toMatchObject({ name: 'Octocats', mascot: 'Mona' });
     expect(listed.body.teams[0].members.map((id: string) => id.toString())).toContain(member._id.toString());
+  });
+  it('rejects adding a member who already belongs to another team', async () => {
+    const { user, team } = await createUserAndTeam('Mona', 'mona@example.com', 'Mona');
+    const response = await request(app).post('/api/teams').send({
+      name: 'Robocats',
+      mascot: 'Hubot',
+      members: [user._id.toString()],
+    });
+
+    expect(response.status).toBe(409);
+    expect(await Team.countDocuments()).toBe(1);
+    expect((await User.findById(user._id))?.team?.toString()).toBe(team._id.toString());
+    expect((await Team.findById(team._id))?.members.map((id) => id.toString())).toContain(user._id.toString());
   });
   it('orders leaderboard entries by total points', async () => {
     const mona = await createUserAndTeam('Mona', 'mona@example.com', 'Mona', 'Octocats');
