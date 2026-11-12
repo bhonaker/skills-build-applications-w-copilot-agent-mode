@@ -55,9 +55,11 @@ describe('OctoFit API contract', () => {
     const member = await User.create({ name: 'Mona', email: 'mona@example.com', fitnessGoal: 'endurance' });
     const invalid = await request(app).post('/api/teams').send({ mascot: 'Mona' });
     expect(invalid.status).toBe(400);
-    const created = await request(app).post('/api/teams').send({ name: 'Octocats', mascot: 'Mona', members: [member._id.toString()] });
+    const memberId = member._id.toString();
+    const created = await request(app).post('/api/teams').send({ name: 'Octocats', mascot: 'Mona', members: [memberId, memberId.toUpperCase(), memberId] });
     expect(created.status).toBe(201);
     expect(created.body.team).toMatchObject({ name: 'Octocats', mascot: 'Mona' });
+    expect(created.body.team.members.map((id: string) => id.toString())).toEqual([memberId]);
     const listed = await request(app).get('/api/teams');
     expect(listed.body.teams).toHaveLength(1);
     expect(listed.body.teams[0]).toMatchObject({ name: 'Octocats', mascot: 'Mona' });

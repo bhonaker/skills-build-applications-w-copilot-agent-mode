@@ -67,9 +67,9 @@ export async function createTeam(input: unknown) {
     throw Object.assign(new Error('Team members must be valid user IDs'), { status: 400 });
   }
 
-  const memberIds = members === undefined ? [] : members;
+  const memberIds = members === undefined ? [] : [...new Set(members.map((memberId) => memberId.toLowerCase()))];
   const existingMembers = await User.find({ _id: { $in: memberIds } }).select('_id');
-  if (existingMembers.length !== new Set(memberIds).size) {
+  if (existingMembers.length !== memberIds.length) {
     throw Object.assign(new Error('One or more team members were not found'), { status: 404 });
   }
 
