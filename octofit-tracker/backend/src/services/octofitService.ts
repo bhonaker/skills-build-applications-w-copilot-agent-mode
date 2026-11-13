@@ -77,7 +77,15 @@ export async function createTeam(input: unknown) {
   }
 
   const team = await Team.create({ name: name.trim(), mascot: mascot.trim(), members: memberIds });
-  await User.updateMany({ _id: { $in: memberIds } }, { $set: { team: team._id } });
+  const assignment = await User.updateMany(
+    { _id: { $in: memberIds }, team: null },
+    { $set: { team: team._id } },
+  );
+  if (assignment.matchedCount !== memberIds.length) {
+    await User.updateMany({ _id: { $in: memberIds }, team: team._id }, { $unset: { team: 1 } });
+    await Team.deleteOne({ _id: team._id });
+    throw Object.assign(new Error('One or more team members already belong to a team'), { status: 409 });
+  }
   return team;
 }
 
